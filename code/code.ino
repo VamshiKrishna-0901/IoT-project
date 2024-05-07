@@ -19,9 +19,9 @@
 # define up_yellow A2
 # define up_green A3
 
-# define stoppingTime 4
-# define waitingTime 2
-# define goTime 7
+int red_timer = 4;
+int yellow_timer = 2;
+int green_timer = 7;
 
 void setup() {
   pinMode(left_ir, INPUT);
@@ -49,56 +49,84 @@ void setup() {
 }
 
 void loop() {
-  non_traffic_rule();
-  ifTraffic();
+  red_timer = 4;
+  yellow_timer = 2;
+  green_timer = 7;
+  no_traffic_rules();
+  if_traffic();
 }
 
-void non_traffic_rule() {
+void no_traffic_rules() {
+  set_lane_lights(left_red, left_yellow, left_green);
+  set_lane_lights(down_red, down_yellow, down_green);
+  set_lane_lights(right_red, right_yellow, right_green);
+  set_lane_lights(up_red, up_yellow, up_green);
+}
+
+void if_traffic() {
+  traffic_on_one_or_more_lanes();
+  traffic_on_all_lanes();
+}
+
+void traffic_on_one_or_more_lanes() {
+  if (digitalRead(left_ir)) {
+    set_lane_lights(left_red, left_yellow, left_green, 3, 2, 10);
+    set_lane_lights(down_red, down_yellow, down_green);
+    set_lane_lights(right_red, right_yellow, right_green);
+    set_lane_lights(up_red, up_yellow, up_green);
+  } 
+  
+  if (digitalRead(right_ir)) {
+    set_lane_lights(left_red, left_yellow, left_green);
+    set_lane_lights(down_red, down_yellow, down_green);
+    set_lane_lights(right_red, right_yellow, right_green, 3, 2, 10);
+    set_lane_lights(up_red, up_yellow, up_green);
+  }
+  
+  if (digitalRead(up_ir)) {
+    set_lane_lights(left_red, left_yellow, left_green);
+    set_lane_lights(down_red, down_yellow, down_green);
+    set_lane_lights(right_red, right_yellow, right_green);
+    set_lane_lights(up_red, up_yellow, up_green, 3, 2, 10);
+  }
+  
+  if (digitalRead(down_ir)) {
+    set_lane_lights(left_red, left_yellow, left_green);
+    set_lane_lights(down_red, down_yellow, down_green, 3, 2, 10);
+    set_lane_lights(right_red, right_yellow, right_green);
+    set_lane_lights(up_red, up_yellow, up_green);
+  }
+}
+
+void traffic_on_all_lanes() {
+  red_timer = 3;
+  green_timer = 10;
+  no_traffic_rules();
+}
+
+void set_lane_lights(int red, int yellow, int green) {
   delay(1000);
-  digitalWrite(left_red, HIGH);
-    delay(stoppingTime);
-  digitalWrite(left_red, LOW);
-  digitalWrite(left_yellow, HIGH);
-    delay(waitingTime);
-  digialWrite(left_yellow, LOW);
-  digitalWrite(left_green, HIGH);
-    delay(goTime);
-
-  digitalWrite(left_green, LOW);
-  digitalWrite(down_red, HIGH);
-    delay(stoppingTime);
-  digitalWrite(down_red, LOW);
-  digitalWrite(down_yellow, HIGH);
-    delay(waitingTime);
-  digitalWrite(down_yellow, LOW);
-  digitalWrite(down_green, HIGH);
-    delay(goTime);
-
-  digitalWrite(down_green, LOW;
-  digitalWrite(right_red, HIGH);
-    delay(stoppingTime);
-  digitalWrite(right_red, LOW);
-  digitalWrite(right_yellow, HIGH);
-    delay(waitingTime);
-  digitalWrite(right_yellow, LOW);
-  digitalWrite(right_green, HIGH);
-    delay(goTime);
-
-  digitalWrite(right_green, LOW);
-  digitalWrite(up_red, HIGH);
-    delay(stoppingTime);
-  digitalWrite(up_red, LOW);
-  digitalWrite(up_yellow, HIGH);
-    delay(waitingTime);
-  digitalWrite(up_yellow, LOW);
-  digitalWrite(up_green, HIGH);
-    delay(goTime);
-  digitalWrite(up_green, LOW);
+  digitalWrite(red, HIGH);
+  delay(red_timer);
+  digitalWrite(red, LOW);
+  digitalWrite(yellow, HIGH);
+  delay(yellow_timer);
+  digitalWrite(yellow, LOW);
+  digitalWrite(green, HIGH);
+  delay(green_timer);
+  digitalWrite(green, LOW);
 }
 
-void ifTraffic() {
-  ifonlyOneLane();
-  ifBothLanes();
-  ifTripleLanes();
-  totalTraffic();
+void set_lane_lights(int red, int yellow, int green, int first_timer, int second_timer, int third_timer) {
+  delay(1000);
+  digitalWrite(red, HIGH);
+  delay(first_timer);
+  digitalWrite(red, LOW);
+  digitalWrite(yellow, HIGH);
+  delay(second_timer);
+  digitalWrite(yellow, LOW);
+  digitalWrite(green, HIGH);
+  delay(third_timer);
+  digitalWrite(green, LOW);
 }
+
